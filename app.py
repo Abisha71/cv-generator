@@ -8,22 +8,27 @@ st.write("Fill in your details and generate a professional PDF CV instantly!")
 
 # --- Input Fields ---
 st.header("Personal Information")
-name = st.text_input("Full Name *", placeholder="John Doe")
+name = st.text_input("Full Name *", placeholder="Wesly Jeyananthan Abisha")
+
 email = st.text_input("Email")
 phone = st.text_input("Phone Number")
-linkedin = st.text_input("LinkedIn Profile URL")
-github = st.text_input("GitHub Profile URL")
-summary = st.text_area("Professional Summary", height=120, placeholder="Write a short professional summary...")
+linkedin = st.text_input("LinkedIn Profile URL", placeholder="https://www.linkedin.com/in/yourprofile")
+github = st.text_input("GitHub Profile URL", placeholder="https://github.com/yourusername")
+
+summary = st.text_area("Professional Summary", height=120, 
+                       placeholder="Write a short professional summary...")
 
 st.header("Education")
-education = st.text_area("Education", height=100, placeholder="BSc Computer Science, University of XYZ, 2024")
+education = st.text_area("Education", height=100, 
+                         placeholder="BSc (Hons) in Information Technology @ Horizon Campus (3rd year)")
 
 st.header("Work Experience")
-experience = st.text_area("Work Experience", height=120, placeholder="Software Engineer, ABC Company, 2023 - Present")
+experience = st.text_area("Work Experience", height=150,
+                          placeholder="Freelance Graphic Designer - Self-Employed\nNovember 2023 - Present\n\n• Designed logos, banners, and marketing materials...\n• Communicated with clients...")
 
 st.header("Skills")
 skills = st.text_area("Skills (comma separated)",
-                      placeholder="Python, Streamlit, SQL, Git, Problem Solving, Team Leadership",
+                      placeholder="Python, Streamlit, Graphic Design, Logo Design, Canva, Figma, Communication, Problem Solving",
                       height=100)
 
 # --- Generate PDF ---
@@ -34,22 +39,37 @@ if st.button("🚀 Generate CV PDF", type="primary", use_container_width=True):
         pdf = FPDF()
         pdf.add_page()
         
-        # === Improved Unicode Support ===
-        # Add a built-in font that works better, or fall back safely
-        pdf.set_font("Helvetica", 'B', 20)   # Helvetica is more reliable than Arial in fpdf2
+        # Name (Big & Centered)
+        pdf.set_font("Helvetica", 'B', 20)
         pdf.cell(0, 15, name.strip(), ln=True, align='C')
         pdf.ln(8)
-        
+
+        # Contact Line - Same Line like your screenshot
         pdf.set_font("Helvetica", '', 11)
-        contacts = []
-        if email: contacts.append(f"Email: {email}")
-        if phone: contacts.append(f"Phone: {phone}")
-        if linkedin: contacts.append(f"LinkedIn: {linkedin}")
-        if github: contacts.append(f"GitHub: {github}")
+        contact_parts = []
         
-        pdf.multi_cell(0, 8, " | ".join(contacts))
+        if email:
+            contact_parts.append(f"Email: {email}")
+        if phone:
+            contact_parts.append(f"Phone: {phone}")
+        
+        contact_line = " | ".join(contact_parts)
+        if contact_line:
+            pdf.cell(0, 8, contact_line, ln=True, align='C')
+            pdf.ln(2)
+
+        # LinkedIn & GitHub on the SAME LINE
+        social = []
+        if linkedin:
+            social.append(f"LinkedIn: {linkedin}")
+        if github:
+            social.append(f"GitHub: {github}")
+        
+        if social:
+            pdf.set_font("Helvetica", '', 10)
+            pdf.cell(0, 8, " | ".join(social), ln=True, align='C')
         pdf.ln(10)
-        
+
         # Sections
         sections = [
             ("Professional Summary", summary),
@@ -65,12 +85,16 @@ if st.button("🚀 Generate CV PDF", type="primary", use_container_width=True):
             
             text = content.strip() if content and content.strip() else f"No {title.lower()} provided."
             
-            # Clean text for safety (replace problematic characters)
-            text = text.replace('–', '-').replace('—', '-').replace('’', "'").replace('‘', "'")
+            # Clean special characters
+            text = (text.replace('–', '-')
+                       .replace('—', '-')
+                       .replace('’', "'")
+                       .replace('‘', "'"))
             
             pdf.multi_cell(0, 8, text)
             pdf.ln(8)
         
+        # Save PDF
         pdf_file = f"{name.strip().replace(' ', '_')}_CV.pdf"
         pdf.output(pdf_file)
         
