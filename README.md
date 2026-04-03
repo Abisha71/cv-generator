@@ -2,7 +2,7 @@
 
 A clean and user-friendly web application built with **Streamlit** that allows you to quickly create a professional CV / Resume and download it as a **PDF** file with just one click.
 
-![CV Generator Preview](https://via.placeholder.com/800x400?text=CV+Generator+Preview)
+![PDF Preview](image/pdf.jpeg)
 
 ## ✨ Features
 
@@ -35,14 +35,11 @@ A clean and user-friendly web application built with **Streamlit** that allows y
     streamlit run app.py
 
   ##  📸 Screenshots
-(You can add screenshots here later)
+![CV Generator Output 1](image/out1.jpeg)
+![CV Generator Output 1](image/out2.jpeg)
+![CV Generator Output 1](image/out3.jpeg)
   ## 🚀 Live Demo
-(Will be added once deployed on Streamlit Cloud)
+https://abisha-cv-generator.streamlit.app/
   ## 👨‍💻 Created By
 Wesly Jeyananthan Abisha
 
-GitHub:  @Abisha71
-
-LinkedIn: Abisha Wesly
-
-YouTube: @shaabi-u5k
