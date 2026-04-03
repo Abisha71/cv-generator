@@ -1,85 +1,92 @@
-# app.py
 import streamlit as st
 from fpdf import FPDF
 
-# --- Page Config ---
 st.set_page_config(page_title="CV Generator", page_icon="📝", layout="centered")
+
 st.title("📝 Simple CV Generator")
-st.write("Fill in your details and generate a PDF CV!")
+st.write("Fill in your details and generate a professional PDF CV instantly!")
 
 # --- Input Fields ---
 st.header("Personal Information")
-name = st.text_input("Full Name")
+name = st.text_input("Full Name *", placeholder="John Doe")
 email = st.text_input("Email")
 phone = st.text_input("Phone Number")
 linkedin = st.text_input("LinkedIn Profile URL")
 github = st.text_input("GitHub Profile URL")
-summary = st.text_area("Professional Summary", height=100)
+summary = st.text_area("Professional Summary", height=120, placeholder="Write a short professional summary...")
 
 st.header("Education")
-education = st.text_area("List your education (e.g., degree, university, year)", height=100)
+education = st.text_area("Education", height=100, placeholder="BSc Computer Science, University of XYZ, 2024")
 
 st.header("Work Experience")
-experience = st.text_area("List your work experience (e.g., company, role, duration)", height=100)
+experience = st.text_area("Work Experience", height=120, placeholder="Software Engineer, ABC Company, 2023 - Present")
 
 st.header("Skills")
-skills = st.text_area("List your skills (comma separated)")
+skills = st.text_area("Skills (comma separated)",
+                      placeholder="Python, Streamlit, SQL, Git, Problem Solving, Team Leadership",
+                      height=100)
 
 # --- Generate PDF ---
-if st.button("Generate CV PDF"):
-    if not name:
-        st.warning("Please enter your name!")
+if st.button("🚀 Generate CV PDF", type="primary", use_container_width=True):
+    if not name or not name.strip():
+        st.error("❌ Please enter your Full Name!")
     else:
         pdf = FPDF()
         pdf.add_page()
         
-        # Personal Info
-        pdf.set_font("Arial", 'B', 16)
-        pdf.cell(0, 10, name, ln=True)
-        pdf.set_font("Arial", '', 12)
-        pdf.cell(0, 10, f"Email: {email}", ln=True)
-        pdf.cell(0, 10, f"Phone: {phone}", ln=True)
-        pdf.cell(0, 10, f"LinkedIn: {linkedin}", ln=True)
-        pdf.cell(0, 10, f"GitHub: {github}", ln=True)
-        pdf.ln(5)
+        # === Improved Unicode Support ===
+        # Add a built-in font that works better, or fall back safely
+        pdf.set_font("Helvetica", 'B', 20)   # Helvetica is more reliable than Arial in fpdf2
+        pdf.cell(0, 15, name.strip(), ln=True, align='C')
+        pdf.ln(8)
         
-        # Professional Summary
-        pdf.set_font("Arial", 'B', 14)
-        pdf.cell(0, 10, "Professional Summary", ln=True)
-        pdf.set_font("Arial", '', 12)
-        pdf.multi_cell(0, 8, summary)
-        pdf.ln(2)
+        pdf.set_font("Helvetica", '', 11)
+        contacts = []
+        if email: contacts.append(f"Email: {email}")
+        if phone: contacts.append(f"Phone: {phone}")
+        if linkedin: contacts.append(f"LinkedIn: {linkedin}")
+        if github: contacts.append(f"GitHub: {github}")
         
-        # Education
-        pdf.set_font("Arial", 'B', 14)
-        pdf.cell(0, 10, "Education", ln=True)
-        pdf.set_font("Arial", '', 12)
-        pdf.multi_cell(0, 8, education)
-        pdf.ln(2)
+        pdf.multi_cell(0, 8, " | ".join(contacts))
+        pdf.ln(10)
         
-        # Work Experience
-        pdf.set_font("Arial", 'B', 14)
-        pdf.cell(0, 10, "Work Experience", ln=True)
-        pdf.set_font("Arial", '', 12)
-        pdf.multi_cell(0, 8, experience)
-        pdf.ln(2)
+        # Sections
+        sections = [
+            ("Professional Summary", summary),
+            ("Education", education),
+            ("Work Experience", experience),
+            ("Skills", skills)
+        ]
         
-        # Skills
-        pdf.set_font("Arial", 'B', 14)
-        pdf.cell(0, 10, "Skills", ln=True)
-        pdf.set_font("Arial", '', 12)
-        pdf.multi_cell(0, 8, skills)
+        for title, content in sections:
+            pdf.set_font("Helvetica", 'B', 14)
+            pdf.cell(0, 10, title, ln=True)
+            pdf.set_font("Helvetica", '', 11)
+            
+            text = content.strip() if content and content.strip() else f"No {title.lower()} provided."
+            
+            # Clean text for safety (replace problematic characters)
+            text = text.replace('–', '-').replace('—', '-').replace('’', "'").replace('‘', "'")
+            
+            pdf.multi_cell(0, 8, text)
+            pdf.ln(8)
         
-        # Save PDF
-        pdf_file = f"{name.replace(' ', '_')}_CV.pdf"
+        pdf_file = f"{name.strip().replace(' ', '_')}_CV.pdf"
         pdf.output(pdf_file)
         
-        # Download Button
         with open(pdf_file, "rb") as f:
-            st.download_button("Download CV PDF", f, file_name=pdf_file, mime="application/pdf")
-        st.success("CV generated successfully!")
+            st.download_button(
+                label="📥 Download Your CV PDF",
+                data=f,
+                file_name=pdf_file,
+                mime="application/pdf",
+                use_container_width=True
+            )
+        
+        st.success("✅ CV generated successfully!")
 
 # --- Footer ---
+st.markdown("---")
 st.markdown(
     """
     <div style="margin-top: 50px; padding: 20px; text-align: center; border-top: 1px solid #ccc;">
